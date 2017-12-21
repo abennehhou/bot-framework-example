@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Bot.Builder.FormFlow;
 using Microsoft.Bot.Connector;
 using TodoListBot.Models;
 using TodoListBot.Repositories;
@@ -41,8 +43,9 @@ namespace TodoListBot.Dialogs
                 }
                 else if (text == IntentEnum.CreateTask.ToString())
                 {
-                    //TODO Implement ViewTasks
-                    await context.PostAsync("Create Task to be implemented");
+                    var formDialog = FormDialog.FromForm(CreateTaskModel.BuildForm, FormOptions.None);
+                    await context.Forward(formDialog, ResumeAfterCreateTask, activity, CancellationToken.None);
+                    return;
                 }
                 else
                 {
@@ -65,6 +68,17 @@ namespace TodoListBot.Dialogs
                     await context.PostAsync(reply);
                 }
             }
+            context.Wait(MessageReceivedAsync);
+        }
+
+        private async Task ResumeAfterCreateTask(IDialogContext context, IAwaitable<CreateTaskModel> result)
+        {
+            var resultFromCreateTask = await result;
+            await context.PostAsync($"Creating this task: {resultFromCreateTask}");
+            var userTodoList = _userTodoListRepository.CreateTodo(resultFromCreateTask, context.Activity.From.Id, context.Activity.From.Name);
+            await context.PostAsync($"Task created, you have now {userTodoList.TodoList.Count} todo(s).");
+
+            // Again, wait for the next message from the user.
             context.Wait(MessageReceivedAsync);
         }
     }
