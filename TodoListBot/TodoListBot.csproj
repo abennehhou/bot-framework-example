@@ -118,7 +118,6 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\CreateTaskModel.cs" />
-    <Compile Include="Models\IntentEnum.cs" />
     <Compile Include="Models\Todo.cs" />
     <Compile Include="Models\TodoStatus.cs" />
     <Compile Include="Models\UserTodoList.cs" />

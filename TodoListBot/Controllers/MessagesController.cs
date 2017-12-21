@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
+using TodoListBot.Dialogs;
+using TodoListBot.Models;
 
 namespace TodoListBot
 {
@@ -18,7 +20,7 @@ namespace TodoListBot
         {
             if (activity.Type == ActivityTypes.Message)
             {
-                await Conversation.SendAsync(activity, () => new Dialogs.RootDialog());
+                await Conversation.SendAsync(activity, () => Chain.From(() => new RootDialog(CreateTaskModel.BuildForm)));
             }
             else
             {
